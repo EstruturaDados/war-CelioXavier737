@@ -80,8 +80,8 @@ void atacar(Territorio* atacante, Territorio* defensor) {
 
     if (dado_atq > dado_def) {
         // atacante vence */
-        strncpy(defensor->cor, atacante->cor, MAX_COR - 1); // usar o max_cor com -1 é uma dica da internet para evitar a copia da string sem deixar espaço para o terminado \0
-        defensor->cor[MAX_COR - 1] = '\0';
+        strncpy(defensor->cor, atacante->cor, TAM_COR - 1); // usar o max_cor com -1 é uma dica da internet para evitar a copia da string sem deixar espaço para o terminado \0
+        defensor->cor[TAM_COR - 1] = '\0';
 
         int transferencia = atacante->tropas / 2; // a divisão se dará pegando apenas o inteiro
         if (transferencia > 0) {
