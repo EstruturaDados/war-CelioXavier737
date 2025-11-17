@@ -36,20 +36,40 @@
 #include <stdlib.h>
 #include <string.h> // uso essa para manipular os fgets()
 
+// COMENTARIO DO ALUNO: Inseri no nivel aventureiro 
+#include <time.h> // incluir time pois será necessário para gerar a semente (seed) da função rand para gerar numeros aleatórios
+
 
 // COMENTARIO DO ALUNO: crio um conjunto de constantes para facilitar a escalabilidade e manuntenção
 
 #define TAM_NOME 30 // tamanho do campo nome dos territorios
 #define TAM_COR 10 // tamanho do campo cor dos territorios
-#define QTD_TERRITORIOS 5 // numero de territorios
+// COMENTARIO DO ALUNO: #define QTD_TERRITORIOS 5 // numero de territorios *** removido no nivel aventureiro pois o número de territórios será definido pelo usuário 
 
 // COMENTARIO DO ALUNO: agora crio a Struct
-
+// COMENTARIO DO ALUNO: no nivel aventureiro a Struct continua igual ao nivel anterior
 typedef struct {
     char nome[TAM_NOME];
     char cor[TAM_COR];
     int tropas;
 } Territorio;
+
+// COMENTARIO DO ALUNO: Nesse ponto eu coloco a função de alocação do mapa de batalha
+Territorio* alocarMapa(int quantidade) {
+    Territorio* mapa = (Territorio*) calloc(quantidade, sizeof(Territorio));
+    if (mapa == NULL) {
+        printf("Erro: falha ao alocar memoria.\n");
+        return NULL;
+    }
+    /* calloc zera a memoria, mas podemos inicializar campos explicitamente se quiser */
+    for (int i = 0; i < quantidade; i++) {
+        mapa[i].nome[0] = '\0';
+        mapa[i].cor[0]  = '\0';
+        mapa[i].tropas  = 0;
+    }
+    return mapa;
+}
+
 
 
 // --- Função Principal (main) ---
@@ -78,7 +98,30 @@ int main() {
 // COMENTARIO DO ALUNO: Aqui começo a codificar o main
 // COMENTARIO DO ALUNO:criando o vetor dos territorios e declarando as variáveis
 
-    Territorio territorios[QTD_TERRITORIOS]; // usei o mesmo nome mas com capitular e no plural para diferenciar e ficar mais identificavel qdo se trata do nome da estrutura e qdo é o vetor
+// COMENTARIO DO ALUNO: removido no nivel aventureiro ->   Territorio territorios[QTD_TERRITORIOS]; // usei o mesmo nome mas com capitular e no plural para diferenciar e ficar mais identificavel qdo se trata do nome da estrutura e qdo é o vetor
+    // COMENTARIO DO ALUNO: inserido no nivel aventureiro
+    srand((unsigned int) time(NULL)); // iniciado o gerador de numero aleatórios
+
+    int quantidade = 0; // variavel para armazenar a escolha de numero de tropoas do usuário
+    do {
+        printf("------------------------------------------------\n");
+        printf("   Informe a quantidade de territorios (min 2): \n");
+        printf("------------------------------------------------\n");
+        printf("Quantidade: ");
+        if (scanf("%d", &quantidade) != 1) {
+            int c; while ((c = getchar()) != '\n' && c != EOF) {} // isso limpa todos os caracteres que sobrarem. Dica que encontrei na internet
+            quantidade = 0;
+        }
+    } while (quantidade < 2); // garanto que não será aceito valores menores que 2;
+    getchar(); // tentar limpar o \n (só por garantia e costume)
+
+    // crio a variavel mapa que substitui o antigo "territorios" como vetor contendo as informações dos territorios
+    // uso ponteiro para referencia e uma função para alocar e inicializar 
+    Territorio* mapa = alocarMapa(quantidade); 
+    if (mapa == NULL) return 1; // se falhar na criação e incialização retorna erro
+
+    ***** parei aqui *** continuo depois
+
     int i; // variavel usada para controle dos loops
 
 // COMENTARIO DO ALUNO: Banner de informação para o usuário
