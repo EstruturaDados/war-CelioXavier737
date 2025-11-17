@@ -102,9 +102,10 @@ void atacar(Territorio* atacante, Territorio* defensor) {
     printf("  %s (%s) - %d tropas\n", defensor->nome, defensor->cor, defensor->tropas);
 }
 
-// função para cadastrar os territórios. Ela pega os dados que o usuário entra
+// COMENTARIO DO ALUNO: função para cadastrar os territórios. Ela pega os dados que o usuário entra
 // para cada  território e armazena em 'mapa'.
 // faz uso de ponteiro para alterar os dados via referência.
+// nos requisitos essa parte seria o inicializarTerritorios mas eu preferi esse nome pois fica mais claro para mim
 
 void cadastrarTerritorios(Territorio* mapa, int quantidade) {
     if (mapa == NULL) return;
@@ -165,6 +166,14 @@ void exibirMapa(const Territorio* mapa, int quantidade) {
         printf(" Cor  : %s\n", mapa[i].cor[0] ? mapa[i].cor : "(sem cor)");
         printf(" Tropas: %d\n", mapa[i].tropas);
         printf("-------------------------------\n");
+    }
+}
+
+
+// função para liberar a memoria alocada para o mapa
+void liberarMemoria(Territorio* mapa) {
+    if (mapa != NULL) {
+        free(mapa);
     }
 }
 
@@ -316,6 +325,7 @@ int main() {
             }
         } else if (opcao == 4) {
             printf("Saindo...\n");
+            liberarMemoria(mapa);
         } else {
             printf("Opcao invalida.\n");
         }
