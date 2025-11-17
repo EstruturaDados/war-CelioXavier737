@@ -102,6 +102,72 @@ void atacar(Territorio* atacante, Territorio* defensor) {
     printf("  %s (%s) - %d tropas\n", defensor->nome, defensor->cor, defensor->tropas);
 }
 
+// função para cadastrar os territórios. Ela pega os dados que o usuário entra
+// para cada  território e armazena em 'mapa'.
+// faz uso de ponteiro para alterar os dados via referência.
+
+void cadastrarTerritorios(Territorio* mapa, int quantidade) {
+    if (mapa == NULL) return;
+
+    int tropas_temp;
+    for (int i = 0; i < quantidade; i++) {
+        printf("\n--- Cadastro do territorio %d de %d ---\n", i + 1, quantidade);
+
+        printf("Nome do territorio: ");
+        if (fgets(mapa[i].nome, TAM_NOME, stdin) == NULL) {
+            mapa[i].nome[0] = '\0';
+        } else {
+            mapa[i].nome[strcspn(mapa[i].nome, "\n")] = '\0';
+        }
+
+        printf("Cor do exercito: ");
+        if (fgets(mapa[i].cor, TAM_COR, stdin) == NULL) {
+            mapa[i].cor[0] = '\0';
+        } else {
+            mapa[i].cor[strcspn(mapa[i].cor, "\n")] = '\0';
+        }
+
+        // valida para garantir que o numero de tropas não seja negativo
+        do {
+            printf("Quantidade de tropas (>=0): ");
+            if (scanf("%d", &tropas_temp) != 1) {
+                // limpa o buffer
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF) { }
+                tropas_temp = -1;
+            } else {
+                if (tropas_temp < 0) {
+                    printf("Valor invalido. Digite um numero 0 ou maior.\n");
+                }
+            }
+        } while (tropas_temp < 0);
+
+        mapa[i].tropas = tropas_temp;
+        getchar(); // novamente a limpeza de outra forma só para garantir
+    }
+
+    printf("\nCadastro concluido para %d territorios.\n", quantidade);
+}
+
+
+// Exibe todos os territórios do mapa.
+// Usa 'const' na linha de parametros para deixar claro que apenas le os dados e não pode modificar eles.
+// Usa um unário nos printf para garantir que mesmo que não haja informação algo seja impresso
+void exibirMapa(const Territorio* mapa, int quantidade) {
+    if (mapa == NULL) return;
+
+    printf("------------------------------------------------\n");
+    printf("                  MAPA ATUAL \n");
+    printf("------------------------------------------------\n");
+    for (int i = 0; i < quantidade; i++) {
+        printf("Indice: %d\n", i + 1);
+        printf(" Nome : %s\n", mapa[i].nome[0] ? mapa[i].nome : "(sem nome)");
+        printf(" Cor  : %s\n", mapa[i].cor[0] ? mapa[i].cor : "(sem cor)");
+        printf(" Tropas: %d\n", mapa[i].tropas);
+        printf("-------------------------------\n");
+    }
+}
+
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
 int main() {
