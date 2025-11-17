@@ -56,21 +56,51 @@ typedef struct {
 
 // COMENTARIO DO ALUNO: Nesse ponto eu coloco a função de alocação do mapa de batalha
 Territorio* alocarMapa(int quantidade) {
-    Territorio* mapa = (Territorio*) calloc(quantidade, sizeof(Territorio));
+    Territorio* mapa = calloc(quantidade, sizeof(Territorio));
     if (mapa == NULL) {
         printf("Erro: falha ao alocar memoria.\n");
         return NULL;
     }
-    /* calloc zera a memoria, mas podemos inicializar campos explicitamente se quiser */
-    for (int i = 0; i < quantidade; i++) {
-        mapa[i].nome[0] = '\0';
-        mapa[i].cor[0]  = '\0';
-        mapa[i].tropas  = 0;
-    }
     return mapa;
 }
 
+// COMENTARIO DO ALUNO: Função para atacar
 
+void atacar(Territorio* atacante, Territorio* defensor) {
+    if (atacante == NULL || defensor == NULL) return; // garante que foram passados dos territorio validos
+
+    printf("\nIniciando ataque: %s (%s, %d tropas) -> %s (%s, %d tropas)\n",
+           atacante->nome, atacante->cor, atacante->tropas,
+           defensor->nome, defensor->cor, defensor->tropas);
+
+    int dado_atq = rand() % 6 + 1; // usando o rand para gerar os dados de ambvos os lados
+    int dado_def = rand() % 6 + 1;
+
+    printf("Rolagem: Atacante %d x Defensor %d\n", dado_atq, dado_def);
+
+    if (dado_atq > dado_def) {
+        // atacante vence */
+        strncpy(defensor->cor, atacante->cor, MAX_COR - 1); // usar o max_cor com -1 é uma dica da internet para evitar a copia da string sem deixar espaço para o terminado \0
+        defensor->cor[MAX_COR - 1] = '\0';
+
+        int transferencia = atacante->tropas / 2; // a divisão se dará pegando apenas o inteiro
+        if (transferencia > 0) {
+            defensor->tropas = transferencia;
+            atacante->tropas -= transferencia;
+        } // note que só há transferência de tropas caso do atacante sejam superiores a 2 pois senão não haveria inteiro na divisão por 2
+
+        printf("Atacante venceu: defensor agora e' da cor %s com %d tropas.\n",
+               defensor->cor, defensor->tropas);
+    } else {
+        // se defensor vence nos dados o atacante perde 1 tropa 
+        if (atacante->tropas > 0) atacante->tropas -= 1;
+        printf("Ataque falhou: atacante perde 1 tropa (restam %d).\n", atacante->tropas);
+    }
+    // mostra como ficaram as tropas e a condição apos o ataque
+    printf("Estado apos ataque:\n");
+    printf("  %s (%s) - %d tropas\n", atacante->nome, atacante->cor, atacante->tropas);
+    printf("  %s (%s) - %d tropas\n", defensor->nome, defensor->cor, defensor->tropas);
+}
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
@@ -120,7 +150,9 @@ int main() {
     Territorio* mapa = alocarMapa(quantidade); 
     if (mapa == NULL) return 1; // se falhar na criação e incialização retorna erro
 
-    ***** parei aqui *** continuo depois
+/*    
+     
+    TRECHA ANTIGO DO PROGRAMA RETIRADO NA VERSAO DO NIVEL AVENTUREIRO
 
     int i; // variavel usada para controle dos loops
 
@@ -170,7 +202,57 @@ int main() {
 
     printf("\n****  Cadastro concluido com sucesso!  ***\n");
 
-    return 0;
+    return 0; */
+    // COMENTARIO DO ALUNO: codigo do nivel aventureiro
+    int opcao = 0; // variavel usada para receber a opção do usuário
+    while (opcao != 4) {
+
+        printf("=============================================\n");
+        printf("                      MENU\n");
+        printf("=============================================\n\n");
+        printf("1) Cadastrar territórios\n");
+        printf("2) Exibir mapa\n");
+        printf("3) Atacar\n");
+        printf("4) Sair\n");
+        printf("=============================================\n\n");
+        printf("Escolha: \n");
+
+        if (scanf("%d", &opcao) != 1) {
+            int c; while ((c = getchar()) != '\n' && c != EOF) {} //esvazia do o buffer
+            opcao = 0;
+        }
+        getchar(); // redundante para garantir a limpeza
+
+        if (opcao == 1) {
+            cadastrarTerritorios(mapa, quantidade);
+        } else if (opcao == 2) {
+            exibirMapa(mapa, quantidade);
+        } else if (opcao == 3) {
+            exibirMapa(mapa, quantidade);
+            int a_idx = -1, d_idx = -1;
+            do {
+                printf("Indice atacante (1..%d): ", quantidade);
+                if (scanf("%d", &a_idx) != 1) { int c; while((c=getchar())!='\n' && c!=EOF){} a_idx = -1; }
+            } while (a_idx < 1 || a_idx > quantidade);
+            do {
+                printf("Indice defensor (1..%d, diferente do atacante): ", quantidade);
+                if (scanf("%d", &d_idx) != 1) { int c; while((c=getchar())!='\n' && c!=EOF){} d_idx = -1; }
+            } while (d_idx < 1 || d_idx > quantidade || d_idx == a_idx);
+            getchar();
+
+            /* validações adicionais */
+            if (mapa[a_idx-1].tropas <= 0) {
+                printf("Atacante nao possui tropas.\n");
+            } else if (mapa[a_idx-1].cor[0] != '\0' && strcmp(mapa[a_idx-1].cor, mapa[d_idx-1].cor) == 0) {
+                printf("Nao pode atacar mesmo dono.\n");
+            } else {
+                atacar(&mapa[a_idx-1], &mapa[d_idx-1]);
+            }
+        } else if (opcao == 4) {
+            printf("Saindo...\n");
+        } else {
+            printf("Opcao invalida.\n");
+        }
 }
 
 // --- Implementação das Funções ---
